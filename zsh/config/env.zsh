@@ -1,16 +1,12 @@
 # =========================
 # ENVIRONMENT & PATH
 # =========================
-export PATH="$HOME/.local/bin:$HOME/bin:/usr/local/bin:$PATH"
-export PATH="$HOME/.cargo/bin:$PATH"
+# Core exports are loaded in ~/.zshenv for both interactive and non-interactive shells.
 
 # bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # nvm — lazy load để tránh làm chậm startup
-export NVM_DIR="$HOME/.nvm"
 _load_nvm() {
   unset -f nvm node npm npx yarn pnpm bun
   [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"

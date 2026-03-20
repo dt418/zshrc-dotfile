@@ -10,7 +10,10 @@ set -e
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ZSH_CONFIG_DIR="$HOME/.config/zsh"
+STARSHIP_CONFIG_DIR="$HOME/.config"
+STARSHIP_CONFIG_FILE="$STARSHIP_CONFIG_DIR/starship.toml"
 BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d_%H%M%S)"
+ZSHENV_FILE="$HOME/.zshenv"
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
 CYAN='\033[0;36m'; BOLD='\033[1m'; RESET='\033[0m'
@@ -57,6 +60,13 @@ cmd_install() {
   info "Setting up ~/.zshrc"
   link "$DOTFILES_DIR/zsh/zshrc" "$HOME/.zshrc"
 
+  info "Setting up ~/.zshenv"
+  link "$DOTFILES_DIR/zsh/.zshenv" "$ZSHENV_FILE"
+
+  info "Setting up ~/.config/starship.toml"
+  mkdir -p "$STARSHIP_CONFIG_DIR"
+  link "$DOTFILES_DIR/starship/starship.toml" "$STARSHIP_CONFIG_FILE"
+
   echo ""
   success "Done! Run: source ~/.zshrc"
   echo ""
@@ -88,6 +98,24 @@ cmd_uninstall() {
     fi
   fi
 
+  # Remove ~/.zshenv symlink
+  if [[ -L "$ZSHENV_FILE" ]]; then
+    target="$(readlink "$ZSHENV_FILE")"
+    if [[ "$target" == "$DOTFILES_DIR"* ]]; then
+      rm "$ZSHENV_FILE"
+      warn "Removed symlink: ~/.zshenv"
+    fi
+  fi
+
+  # Remove ~/.config/starship.toml symlink
+  if [[ -L "$STARSHIP_CONFIG_FILE" ]]; then
+    target="$(readlink "$STARSHIP_CONFIG_FILE")"
+    if [[ "$target" == "$DOTFILES_DIR"* ]]; then
+      rm "$STARSHIP_CONFIG_FILE"
+      warn "Removed symlink: ~/.config/starship.toml"
+    fi
+  fi
+
   # Restore latest backup if available
   latest_backup=$(ls -td "$HOME/.dotfiles-backup/"*/ 2>/dev/null | head -1)
   if [[ -n "$latest_backup" ]]; then
@@ -100,6 +128,8 @@ cmd_uninstall() {
         name="$(basename "$f")"
         case "$name" in
           .zshrc) cp "$f" "$HOME/.zshrc" && success "Restored ~/.zshrc" ;;
+          .zshenv) cp "$f" "$ZSHENV_FILE" && success "Restored ~/.zshenv" ;;
+          starship.toml) cp "$f" "$STARSHIP_CONFIG_FILE" && success "Restored ~/.config/starship.toml" ;;
           *.zsh|*.sh) cp "$f" "$ZSH_CONFIG_DIR/$name" && success "Restored $name" ;;
         esac
       done

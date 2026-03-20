@@ -12,10 +12,15 @@ dotfiles/
 ├── Makefile                      ← Shortcut: make install, make update...
 ├── .gitignore
 ├── README.md
+├── test/
+│   └── zsh_test.sh               ← smoke test cho aliases/functions
+├── starship/
+│   └── starship.toml             ← ~/.config/starship.toml
 └── zsh/
+    ├── .zshenv                   ← ~/.zshenv (core env cho cả interactive + non-interactive)
     ├── zshrc                     ← ~/.zshrc  (entry point, chỉ source các module)
     └── config/
-        ├── env.zsh               ← PATH, NVM, BUN, brew, atuin, envman
+        ├── env.zsh               ← init runtime: bun hook, lazy NVM, brew, atuin, envman
         ├── options.zsh           ← ZSH options + HISTSIZE
         ├── completion.zsh        ← compinit, zstyle, docker/kubectl completion
         ├── plugins.zsh           ← fzf, zoxide, starship, autosuggestions, syntax-highlight, atuin
@@ -28,6 +33,8 @@ dotfiles/
 ```
 
 > **`local.zsh`** được load cuối cùng — dùng để override alias, thêm env var hoặc cấu hình riêng mà không cần chỉnh file chung.
+
+> **`.zshenv`** luôn được Zsh load trước (kể cả non-interactive shell). Chỉ để biến môi trường cốt lõi, tránh `source`/`eval` nặng trong file này.
 
 ---
 
@@ -209,6 +216,24 @@ git pull   # trong ~/dotfiles/
 ```
 
 Vì dùng symlink nên thay đổi có hiệu lực ngay — không cần chạy lại `install.sh`.
+
+### Kiểm tra syntax nhanh
+
+```bash
+make lint
+```
+
+### Chạy smoke test
+
+```bash
+make test
+```
+
+Chạy một test đơn theo alias:
+
+```bash
+make test TEST="alias ls"
+```
 
 ### Gỡ cài đặt
 
