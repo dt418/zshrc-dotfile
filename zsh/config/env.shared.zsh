@@ -7,7 +7,9 @@
 
 # nvm — lazy load để tránh làm chậm startup
 _load_nvm() {
-  unset -f nvm node npm npx yarn pnpm bun
+  for cmd in nvm node npm npx yarn pnpm bun; do
+    (( ${+functions[$cmd]} )) && unset -f "$cmd"
+  done
   [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
   [ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
 }
