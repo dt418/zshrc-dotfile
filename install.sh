@@ -5,6 +5,7 @@
 #   ./install.sh              — cài đặt (tạo symlinks)
 #   ./install.sh --uninstall  — gỡ cài đặt (xóa symlinks, khôi phục backup)
 #   ./install.sh --doctor     — kiểm tra tool nào chưa cài
+#   ./install.sh --menu       — TUI menu (fzf/select) để chọn tác vụ
 # =============================================================
 set -e
 
@@ -40,6 +41,50 @@ link() {
   backup_if_needed "$dest"
   ln -sfn "$src" "$dest"
   success "Linked $(basename "$dest")"
+}
+
+run_menu() {
+  local choice
+  local options=(
+    "Install dotfiles"
+    "Uninstall dotfiles"
+    "Doctor check"
+    "Run smoke test"
+    "Run startup bench"
+    "Exit"
+  )
+
+  echo ""
+  echo -e "${BOLD}dotfiles menu${RESET}"
+  echo ""
+
+  if command -v fzf >/dev/null 2>&1; then
+    choice="$(printf '%s\n' "${options[@]}" | fzf --prompt='Select action > ' --height=40% --reverse)"
+  else
+    PS3="Select action (1-${#options[@]}): "
+    select opt in "${options[@]}"; do
+      choice="$opt"
+      break
+    done
+  fi
+
+  case "$choice" in
+    "Install dotfiles")   cmd_install ;;
+    "Uninstall dotfiles") cmd_uninstall ;;
+    "Doctor check")       cmd_doctor ;;
+    "Run smoke test")
+      zsh "$DOTFILES_DIR/test/zsh_test.sh"
+      ;;
+    "Run startup bench")
+      for i in 1 2 3 4 5; do time zsh -i -c exit; done
+      ;;
+    "Exit"|"")
+      info "Bye."
+      ;;
+    *)
+      error "Unknown menu choice."
+      ;;
+  esac
 }
 
 # ─── Install ──────────────────────────────────────────────────────────────────
@@ -181,8 +226,9 @@ cmd_doctor() {
 # ─── Entry point ──────────────────────────────────────────────────────────────
 
 case "${1:-}" in
+  --menu)      run_menu      ;;
   --uninstall) cmd_uninstall ;;
   --doctor)    cmd_doctor    ;;
   "")          cmd_install   ;;
-  *)           error "Unknown option: $1. Use --uninstall or --doctor." ;;
+  *)           error "Unknown option: $1. Use --menu, --uninstall or --doctor." ;;
 esac

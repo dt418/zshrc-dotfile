@@ -20,7 +20,10 @@ dotfiles/
     ├── .zshenv                   ← ~/.zshenv (core env cho cả interactive + non-interactive)
     ├── zshrc                     ← ~/.zshrc  (entry point, chỉ source các module)
     └── config/
-        ├── env.zsh               ← init runtime: bun hook, lazy NVM, brew, atuin, envman
+        ├── env.zsh               ← entrypoint env, detect OS và source module phù hợp
+        ├── env.shared.zsh        ← phần env dùng chung: bun hook, lazy NVM, atuin, envman
+        ├── env.linux.zsh         ← Linux-specific env (Linuxbrew, path riêng nếu cần)
+        ├── env.macos.zsh         ← macOS-specific env (Homebrew Apple Silicon/Intel)
         ├── options.zsh           ← ZSH options + HISTSIZE
         ├── completion.zsh        ← compinit, zstyle, docker/kubectl completion
         ├── plugins.zsh           ← fzf, zoxide, starship, autosuggestions, syntax-highlight, atuin
@@ -216,6 +219,32 @@ git pull   # trong ~/dotfiles/
 ```
 
 Vì dùng symlink nên thay đổi có hiệu lực ngay — không cần chạy lại `install.sh`.
+
+### Quản lý bằng chezmoi (cơ bản)
+
+Repo vẫn giữ cấu trúc hiện tại. Các lệnh dưới đây chỉ thêm workflow tùy chọn để quản lý dotfiles bằng chezmoi:
+
+```bash
+# Cài chezmoi vào ~/.local/bin
+make chezmoi-install
+
+# Khởi tạo từ repo này và apply ngay
+make chezmoi-init
+
+# Apply các thay đổi mới
+make chezmoi-apply
+```
+
+### Dùng TUI menu cho thao tác nhanh
+
+```bash
+make menu
+# hoặc
+./install.sh --menu
+```
+
+Menu hỗ trợ `Install`, `Uninstall`, `Doctor`, `Test`, `Bench`.
+Nếu có `fzf` sẽ dùng fuzzy menu, nếu không có sẽ fallback sang menu dạng `select`.
 
 ### Kiểm tra syntax nhanh
 

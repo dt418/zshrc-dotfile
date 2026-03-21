@@ -1,4 +1,4 @@
-.PHONY: install uninstall update bench doctor lint test
+.PHONY: install uninstall update bench doctor lint test menu chezmoi-install chezmoi-init chezmoi-apply
 
 install:
 	@./install.sh
@@ -24,3 +24,15 @@ bench:
 
 doctor:
 	@./install.sh --doctor
+
+menu:
+	@./install.sh --menu
+
+chezmoi-install:
+	@sh -c "$$(curl -fsLS get.chezmoi.io)" -- -b "$(HOME)/.local/bin"
+
+chezmoi-init:
+	@~/.local/bin/chezmoi init --apply thanhd/dotfiles
+
+chezmoi-apply:
+	@~/.local/bin/chezmoi apply -v

@@ -18,6 +18,8 @@ Danh sách cải tiến được chia thành **đã thực hiện** và **đề 
 - [x] Thêm smoke test `test/zsh_test.sh` + `make test`
 - [x] Hỗ trợ chạy test đơn: `make test TEST="alias <name>"`
 - [x] Quản lý `starship/starship.toml` trong repo và symlink sang `~/.config/starship.toml`
+- [x] Auto-repair history chạy detached, tránh warning `jobs SIGHUPed`
+- [x] Thêm TUI menu trong `install.sh --menu` (ưu tiên `fzf`, fallback `select`)
 
 ---
 
@@ -43,7 +45,7 @@ make bench
 
 ### 3. `Makefile` mở rộng
 
-Đã có: `lint`, `test`, `update`, `doctor`, `bench`.
+Đã có: `lint`, `test`, `update`, `doctor`, `bench`, `menu`, `chezmoi-install`, `chezmoi-init`, `chezmoi-apply`.
 
 ---
 
@@ -55,21 +57,17 @@ make bench
 
 ### 5. Hỗ trợ macOS / Linux tự động
 
-Một số alias và path khác nhau giữa macOS và Linux. Có thể detect trong `env.zsh`:
+Đã áp dụng:
 
-```zsh
-if [[ "$(uname)" == "Darwin" ]]; then
-  source "$ZSH_CONFIG/env.macos.zsh"
-else
-  source "$ZSH_CONFIG/env.linux.zsh"
-fi
-```
+- `env.zsh` làm entrypoint detect OS
+- `env.shared.zsh` chứa logic dùng chung
+- `env.macos.zsh` và `env.linux.zsh` chứa setup theo hệ điều hành
 
 ---
 
 ### 6. Tích hợp `chezmoi` (dài hạn)
 
-Nếu dotfiles ngày càng phức tạp (nhiều máy, nhiều secret), cân nhắc dùng [chezmoi](https://www.chezmoi.io/) — hỗ trợ template, secret manager, diff tool.
+Đã thêm mức cơ bản trong `Makefile` để cài/init/apply với [chezmoi](https://www.chezmoi.io/) mà chưa cần đổi cấu trúc repo hiện tại.
 
 ---
 
