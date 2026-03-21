@@ -1,3 +1,53 @@
+# macOS
 .DS_Store
+
+# Machine-specific overrides (never commit)
 zsh/config/local.zsh
+
+# Backup directories
+.dotfiles-backup/
+
+# Agent tool directories (keep .agents/skills/ tracked)
+.adal/
+.agent/
+.augment/
+.claude/
+.codebuddy/
+.commandcode/
+.continue/
+.cortex/
+.crush/
+.factory/
+.goose/
+.iflow/
+.junie/
+.kilocode/
+.kiro/
+.kode/
+.mcpjam/
+.mux/
+.neovate/
+.openhands/
+.pi/
+.pochi/
+.qoder/
+.qwen/
+.roo/
+.trae/
+.vibe/
+.windsurf/
+.zencoder/
+
+# Skill lock files (generated)
+skills-lock.json
+
+# Common backup patterns
 *.bak
+*~
+
+# Lefthook
+.lefthook*
+
+# npm
+node_modules/
+package-lock.json

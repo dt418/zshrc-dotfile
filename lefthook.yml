@@ -1,0 +1,31 @@
+# lefthook.yml
+# Git hooks configuration for dotfiles
+#
+# Install lefthook:
+#   brew install lefthook
+#   lefthook install
+#
+# Or use npm:
+#   npm install -D @evilmartians/lefthook
+#   npx lefthook install
+#
+# Skip hooks temporarily:
+#   git commit --no-verify
+#
+# Run hooks manually:
+#   lefthook run pre-commit
+#   lefthook run commit-msg
+
+commit-msg:
+  commands:
+    commitlint:
+      run: npx --no -- commitlint --edit {1}
+      stage_fixed: true
+
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      run: make lint
+    test:
+      run: make test

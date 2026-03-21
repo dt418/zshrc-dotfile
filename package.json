@@ -1,0 +1,13 @@
+{
+  "name": "dotfiles",
+  "private": true,
+  "description": "Modular Zsh dotfiles with symlink installer",
+  "scripts": {
+    "postinstall": "lefthook install"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "@evilmartians/lefthook": "^1.10.0"
+  }
+}
