@@ -23,6 +23,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 - `_load_nvm` function now safely handles unset function names
+- `_load_nvm` auto-detects NVM_DIR from common locations (`~/.nvm`, `~/.local/share/nvm`, `~/nvm`) for Linux/Windows
+- Added lazy-load wrappers for `yarn`, `pnpm`, `bun` alongside existing `nvm/node/npm/npx`
 - Commit message format enforced via commitlint (lowercase header)
 
 ## [1.0.0] - 2024-01-01

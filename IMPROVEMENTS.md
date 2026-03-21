@@ -20,6 +20,9 @@ Danh sách cải tiến được chia thành **đã thực hiện** và **đề 
 - [x] Quản lý `starship/starship.toml` trong repo và symlink sang `~/.config/starship.toml`
 - [x] Auto-repair history chạy detached, tránh warning `jobs SIGHUPed`
 - [x] Thêm TUI menu trong `install.sh --menu` (ưu tiên `fzf`, fallback `select`)
+- [x] Git hooks với lefthook (pre-commit lint/test, commit-msg commitlint)
+- [x] Code review skill và changelog automation skill cho agent
+- [x] `AGENTS.md` với comprehensive guidelines cho AI agent
 
 ---
 
@@ -31,31 +34,28 @@ Danh sách cải tiến được chia thành **đã thực hiện** và **đề 
 
 ---
 
-### 2. Đo tốc độ startup
-
-**Mục đích:** Biết module nào làm chậm shell.
+### 2. Đo tốc độ startup ✅
 
 ```bash
-# Thêm vào Makefile
 make bench
 # → chạy: for i in $(seq 1 5); do time zsh -i -c exit; done
 ```
 
 ---
 
-### 3. `Makefile` mở rộng
+### 3. `Makefile` mở rộng ✅
 
 Đã có: `lint`, `test`, `update`, `doctor`, `bench`, `menu`, `chezmoi-install`, `chezmoi-init`, `chezmoi-apply`.
 
 ---
 
-### 4. Script `doctor.sh` — kiểm tra tool chưa cài
+### 4. Script `doctor.sh` — kiểm tra tool chưa cài ✅
 
 Đã có qua `./install.sh --doctor` và `make doctor`.
 
 ---
 
-### 5. Hỗ trợ macOS / Linux tự động
+### 5. Hỗ trợ macOS / Linux tự động ✅
 
 Đã áp dụng:
 
@@ -75,7 +75,5 @@ make bench
 
 | # | Cải tiến | Độ ưu tiên | Effort |
 |---|---|---|---|
-| 2 | Đo startup speed | 🟡 Trung bình | Thấp |
-| 4 | Hỗ trợ macOS / Linux detect | 🟢 Thấp | Trung bình |
-| 5 | Tách env theo OS (env.macos.zsh/env.linux.zsh) | 🟢 Thấp | Trung bình |
-| 6 | chezmoi | 🟢 Thấp | Cao |
+| 6 | chezmoi | 🟡 Trung bình | Cao |
+| 7 | Zsh plugin manager (zinit/zplugin) | 🟡 Trung bình | Cao |
