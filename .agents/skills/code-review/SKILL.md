@@ -1,64 +1,75 @@
 ---
 name: code-review
-description: Use when completing tasks, implementing features, or before merging to verify changes meet requirements
+description: Review dotfiles changes for quality before merge
 ---
 
 # Code Review
 
-Use the `reviewer.md` template to dispatch a subagent for code review.
+Review changes using Task tool with `general` agent and this prompt.
 
-## When to Request Review
+## Quick Start
 
-**Mandatory:**
-- After completing feature or fix
+```bash
+# Run automated checks
+make lint && make test
+
+# View changes
+git diff HEAD~1..HEAD
+git status --short
+```
+
+## Review Checklist
+
+**Syntax & Style:**
+- `zsh -n` passes for all .zsh files
+- Shebang: `#!/usr/bin/env zsh` or `#!/usr/bin/env bash`
+- Section headers: `# =========================`
+
+**Module Organization:**
+- `zsh/zshrc` only sources modules (no logic)
+- `zsh/.zshenv` minimal (core exports only)
+- New behavior → appropriate `zsh/config/*.zsh`
+
+**Integrations:**
+- Optional tools guarded: `command -v`, `[ -f ]`, `[ -s ]`
+
+**Testing:**
+- New aliases/functions have test assertions in `test/zsh_test.sh`
+
+**Git:**
+- Commit follows: `<type>(<scope>): <description>`
+- Valid types: feat, fix, docs, style, refactor, test, chore, perf, ci
+- Valid scopes: aliases, functions, plugins, completion, keybindings, env, install, test, docs, hooks
+
+## Review Prompt Template
+
+```
+# Code Review
+
+Review the dotfiles repository changes.
+
+1. Run: git diff HEAD~1..HEAD
+2. Run: make lint && make test
+3. Check:
+   - Zsh syntax valid
+   - Module organization correct
+   - Guards for optional tools
+   - Tests pass
+   - Commit format valid
+
+Output:
+### Summary
+[Overview]
+
+### Issues
+[Critical/Important/Minor with file:line]
+
+### Assessment
+Ready to merge? Yes/No/With fixes
+```
+
+## When to Review
+
+- After completing feature/fix
 - Before merge to main
-- After implementing major change
-
-**Optional but valuable:**
 - When stuck (fresh perspective)
-- Before refactoring (baseline check)
-- After fixing complex bug
-
-## How to Request
-
-**1. Get the diff:**
-```bash
-git diff HEAD~1..HEAD        # Review last commit
-git diff origin/main..HEAD   # Review unmerged changes
-```
-
-**2. Dispatch `general` subagent with reviewer.md template:**
-
-Use Task tool with `general` agent type, providing the content of `reviewer.md` as the prompt.
-
-## What to Review
-
-- Zsh syntax validity (`zsh -n`)
-- Alias/function definitions match test assertions
-- Module loading order preserved
-- Guarded integrations (`command -v`, `[ -f ]`)
-- Error handling patterns
-- Commit message format
-
-## Act on Feedback
-
-- **Critical:** Fix immediately
-- **Important:** Fix before proceeding
-- **Minor:** Note for later
-- **Feedback:** Push back if reviewer is wrong (with reasoning)
-
-## Quick Review Commands
-
-```bash
-# Syntax check all zsh files
-make lint
-
-# Run smoke tests
-make test
-
-# Run single test
-make test TEST="alias ls"
-
-# Verify module load order
-grep -n "source" zsh/zshrc
-```

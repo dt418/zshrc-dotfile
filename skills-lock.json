@@ -5,6 +5,11 @@
       "source": "wshobson/agents",
       "sourceType": "github",
       "computedHash": "186f3db6c967bd19ff6ffeeb5d6cae84f7443cdae50835b57f61449a5696e7a4"
+    },
+    "docs-changelog": {
+      "source": "google-gemini/gemini-cli",
+      "sourceType": "github",
+      "computedHash": "65f5a4ac203d3a1e0c565783c24cda1a0c55f2735f39f4d5e0ea66fb52e55fad"
     }
   }
 }
