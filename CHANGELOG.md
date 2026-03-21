@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - `lefthook.yml` with pre-commit (lint, test) and commit-msg hooks
 - `package.json` with lefthook and commitlint dependencies
 - `zsh/config/env.shared.zsh` - shared environment with lazy NVM, bun, atuin
+- `.zshenv` prepends default NVM node version to PATH for faster access
 
 ### Changed
 - `install.sh` now runs `npx lefthook install` on setup
