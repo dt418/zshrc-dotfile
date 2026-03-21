@@ -52,45 +52,40 @@ link() {
 
 run_menu() {
 	local choice
-	local options=(
-		"Install dotfiles"
-		"Uninstall dotfiles"
-		"Doctor check"
-		"Run smoke test"
-		"Run startup bench"
-		"Exit"
-	)
+	local fzf_opts="--prompt='  Select action > ' --height=50% --reverse --color=bg:+1,pointer:6,highlight:6"
 
-	echo ""
-	echo -e "${BOLD}dotfiles menu${RESET}"
-	echo ""
-
-	if command -v fzf >/dev/null 2>&1; then
-		choice="$(printf '%s\n' "${options[@]}" | fzf --prompt='Select action > ' --height=40% --reverse)"
-	else
-		PS3="Select action (1-${#options[@]}): "
-		select opt in "${options[@]}"; do
-			choice="$opt"
-			break
-		done
+	if ! command -v fzf >/dev/null 2>&1; then
+		error "fzf not installed. Install with: brew install fzf"
 	fi
 
+	choice=$(
+		printf "📦  Install      │ Apply dotfiles symlinks to home\n" \
+			"🔄  Update       │ Git pull + reload config\n" \
+			"🩺  Doctor       │ Check installed tools\n" \
+			"✅  Test         │ Run smoke tests\n" \
+			"📊  Benchmark    │ Measure shell startup time\n" \
+			"📝  Edit Config  │ Open dotfiles in nvim\n" \
+			"🗑️  Uninstall    │ Remove symlinks (with backup)\n" \
+			"❌  Exit         │ Quit menu\n" |
+			fzf --expect=Enter --header=$'╔══════════════════════════════════════════════════════╗\n║              🚀 DOTFILES MANAGEMENT MENU               ║\n╚══════════════════════════════════════════════════════╝' \
+				--delimiter='│' --with-nth=1 \
+				--preview='echo {2}' \
+				--preview-window=down:3:wrap \
+				$fzf_opts
+	)
+
+	key="$choice"
+	choice=$(echo "$choice" | tail -1)
+
 	case "$choice" in
-	"Install dotfiles") cmd_install ;;
-	"Uninstall dotfiles") cmd_uninstall ;;
-	"Doctor check") cmd_doctor ;;
-	"Run smoke test")
-		zsh "$DOTFILES_DIR/test/zsh_test.sh"
-		;;
-	"Run startup bench")
-		for i in 1 2 3 4 5; do time zsh -i -c exit; done
-		;;
-	"Exit" | "")
-		info "Bye."
-		;;
-	*)
-		error "Unknown menu choice."
-		;;
+	*"Install") cmd_install ;;
+	*"Update") cmd_update ;;
+	*"Doctor") cmd_doctor ;;
+	*"Test") cmd_test ;;
+	*"Benchmark") cmd_benchmark ;;
+	*"Edit Config") cmd_edit ;;
+	*"Uninstall") cmd_uninstall_confirm ;;
+	*"Exit" | "") info "Bye." ;;
 	esac
 }
 
@@ -129,58 +124,127 @@ cmd_install() {
 	echo ""
 }
 
+# ─── Update ───────────────────────────────────────────────────────────────────
+
+cmd_update() {
+	echo ""
+	echo -e "${BOLD}Updating dotfiles...${RESET}"
+	cd "$DOTFILES_DIR"
+	if git diff --quiet && git diff --cached --quiet; then
+		info "No local changes. Pulling from remote..."
+		git pull --ff-only
+		success "Updated to latest."
+	else
+		warn "You have uncommitted changes. Commit or stash first."
+		git status --short
+		echo ""
+		read -r -p "Stash and pull? [y/N] " reply
+		if [[ "$reply" =~ ^[Yy]$ ]]; then
+			git stash
+			git pull --ff-only
+			success "Updated. Restoring stash..."
+			git stash pop
+		else
+			info "Update cancelled."
+			return
+		fi
+	fi
+	source ~/.zshrc
+	echo ""
+	success "Done. Config reloaded."
+	echo ""
+}
+
+# ─── Test ─────────────────────────────────────────────────────────────────────
+
+cmd_test() {
+	echo ""
+	echo -e "${BOLD}Running smoke tests...${RESET}"
+	zsh "$DOTFILES_DIR/test/zsh_test.sh"
+}
+
+# ─── Benchmark ───────────────────────────────────────────────────────────────
+
+cmd_benchmark() {
+	echo ""
+	echo -e "${BOLD}Measuring shell startup time (5 runs)...${RESET}"
+	for i in 1 2 3 4 5; do time zsh -i -c exit 2>&1; done | grep real
+}
+
+# ─── Edit Config ──────────────────────────────────────────────────────────────
+
+cmd_edit() {
+	if ! command -v nvim >/dev/null 2>&1; then
+		warn "nvim not installed. Opening with vim..."
+		nvim="$EDITOR"
+	fi
+	nvim "$DOTFILES_DIR"
+}
+
 # ─── Uninstall ────────────────────────────────────────────────────────────────
+
+cmd_uninstall_confirm() {
+	echo ""
+	warn "⚠️  This will remove all dotfile symlinks from your home directory."
+	read -r -p "Continue? [y/N] " reply
+	if [[ ! "$reply" =~ ^[Yy]$ ]]; then
+		info "Cancelled."
+		return
+	fi
+	cmd_uninstall
+}
 
 cmd_uninstall() {
 	echo ""
 	echo -e "${BOLD}Uninstalling dotfiles...${RESET}"
 	echo ""
 
-	# Remove symlinks in ~/.config/zsh/ that point into dotfiles
+	local removed=0
+
 	for f in "$ZSH_CONFIG_DIR"/*.zsh "$ZSH_CONFIG_DIR"/*.sh; do
 		[[ -L "$f" ]] || continue
 		target="$(readlink "$f")"
 		if [[ "$target" == "$DOTFILES_DIR"* ]]; then
 			rm "$f"
 			warn "Removed symlink: $(basename "$f")"
+			((removed++))
 		fi
 	done
 
-	# Remove ~/.zshrc symlink
 	if [[ -L "$HOME/.zshrc" ]]; then
 		target="$(readlink "$HOME/.zshrc")"
 		if [[ "$target" == "$DOTFILES_DIR"* ]]; then
 			rm "$HOME/.zshrc"
 			warn "Removed symlink: ~/.zshrc"
+			((removed++))
 		fi
 	fi
 
-	# Remove ~/.zshenv symlink
 	if [[ -L "$ZSHENV_FILE" ]]; then
 		target="$(readlink "$ZSHENV_FILE")"
 		if [[ "$target" == "$DOTFILES_DIR"* ]]; then
 			rm "$ZSHENV_FILE"
 			warn "Removed symlink: ~/.zshenv"
+			((removed++))
 		fi
 	fi
 
-	# Remove ~/.config/starship.toml symlink
 	if [[ -L "$STARSHIP_CONFIG_FILE" ]]; then
 		target="$(readlink "$STARSHIP_CONFIG_FILE")"
 		if [[ "$target" == "$DOTFILES_DIR"* ]]; then
 			rm "$STARSHIP_CONFIG_FILE"
 			warn "Removed symlink: ~/.config/starship.toml"
+			((removed++))
 		fi
 	fi
 
-	# Restore latest backup if available
 	latest_backup=$(ls -td "$HOME/.dotfiles-backup/"*/ 2>/dev/null | head -1)
-	if [[ -n "$latest_backup" ]]; then
+	if [[ -n "$latest_backup" && -d "$latest_backup" ]]; then
 		echo ""
 		info "Found backup: $latest_backup"
 		read -r -p "Restore this backup? [y/N] " reply
 		if [[ "$reply" =~ ^[Yy]$ ]]; then
-			for f in "$latest_backup"*; do
+			for f in "$latest_backup"/*; do
 				[[ -f "$f" ]] || continue
 				name="$(basename "$f")"
 				case "$name" in
@@ -194,7 +258,7 @@ cmd_uninstall() {
 	fi
 
 	echo ""
-	success "Uninstall complete."
+	success "Uninstall complete. Removed $removed symlink(s)."
 	echo ""
 }
 

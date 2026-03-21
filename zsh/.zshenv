@@ -12,6 +12,8 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 export NVM_DIR="$HOME/.nvm"
 
+export NODE_OPTIONS=--dns-result-order=ipv4first
+
 # Prepend Linux NVM node to PATH (before Windows NVM paths from WSL)
 if [[ -s "$NVM_DIR/nvm.sh" ]]; then
   local nvm_version
