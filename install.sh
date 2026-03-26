@@ -51,41 +51,64 @@ link() {
 }
 
 run_menu() {
-	local choice
-	local fzf_opts="--prompt='  Select action > ' --height=50% --reverse --color=bg:+1,pointer:6,highlight:6"
-
 	if ! command -v fzf >/dev/null 2>&1; then
 		error "fzf not installed. Install with: brew install fzf"
 	fi
 
-	choice=$(
-		printf "📦  Install      │ Apply dotfiles symlinks to home\n" \
-			"🔄  Update       │ Git pull + reload config\n" \
-			"🩺  Doctor       │ Check installed tools\n" \
-			"✅  Test         │ Run smoke tests\n" \
-			"📊  Benchmark    │ Measure shell startup time\n" \
-			"📝  Edit Config  │ Open dotfiles in nvim\n" \
-			"🗑️  Uninstall    │ Remove symlinks (with backup)\n" \
-			"❌  Exit         │ Quit menu\n" |
-			fzf --expect=Enter --header=$'╔══════════════════════════════════════════════════════╗\n║              🚀 DOTFILES MANAGEMENT MENU               ║\n╚══════════════════════════════════════════════════════╝' \
-				--delimiter='│' --with-nth=1 \
-				--preview='echo {2}' \
-				--preview-window=down:3:wrap \
-				$fzf_opts
-	)
+	local choice
 
-	key="$choice"
-	choice=$(echo "$choice" | tail -1)
+	if [[ -t 0 ]]; then
+		local fzf_opts="--prompt='Select action > ' --height=50% --reverse --color=bg:+1,pointer:6,highlight:6 --bind=enter:accept"
+
+		choice=$(
+			printf "📦 Install      │ Apply dotfiles symlinks to home\n" \
+				"🔄 Update       │ Git pull + reload config\n" \
+				"🩺 Doctor       │ Check installed tools\n" \
+				"✅ Test         │ Run smoke tests\n" \
+				"📊 Benchmark    │ Measure shell startup time\n" \
+				"📝 Edit Config  │ Open dotfiles in nvim\n" \
+				"🗑️ Uninstall    │ Remove symlinks (with backup)\n" \
+				"❌ Exit         │ Quit menu\n" |
+				fzf --delimiter='│' --with-nth=1 $fzf_opts
+		)
+	else
+		info "No TTY detected. Using fallback menu..."
+		local options=(
+			"Install - Apply dotfiles symlinks to home"
+			"Update - Git pull + reload config"
+			"Doctor - Check installed tools"
+			"Test - Run smoke tests"
+			"Benchmark - Measure shell startup time"
+			"Edit Config - Open dotfiles in nvim"
+			"Uninstall - Remove symlinks (with backup)"
+			"Exit - Quit menu"
+		)
+
+		PS3="Select action (1-${#options[@]}): "
+		select opt in "${options[@]}"; do
+			if [[ -n "$opt" ]]; then
+				choice="$opt"
+				break
+			fi
+		done
+	fi
 
 	case "$choice" in
-	*"Install") cmd_install ;;
-	*"Update") cmd_update ;;
-	*"Doctor") cmd_doctor ;;
-	*"Test") cmd_test ;;
-	*"Benchmark") cmd_benchmark ;;
-	*"Edit Config") cmd_edit ;;
-	*"Uninstall") cmd_uninstall_confirm ;;
-	*"Exit" | "") info "Bye." ;;
+	Install*) cmd_install ;;
+	Update*) cmd_update ;;
+	Doctor*) cmd_doctor ;;
+	Test*) cmd_test ;;
+	Benchmark*) cmd_benchmark ;;
+	Edit*) cmd_edit ;;
+	Uninstall*) cmd_uninstall_confirm ;;
+	Exit* | "") info "Bye." ;;
+	*)
+		if [[ -z "$choice" ]]; then
+			info "Bye."
+		else
+			error "Unknown choice: $choice"
+		fi
+		;;
 	esac
 }
 
@@ -132,8 +155,8 @@ cmd_update() {
 	cd "$DOTFILES_DIR"
 	if git diff --quiet && git diff --cached --quiet; then
 		info "No local changes. Pulling from remote..."
-		git pull --ff-only
-		success "Updated to latest."
+		git pull --no-rebase
+		success "Updated."
 	else
 		warn "You have uncommitted changes. Commit or stash first."
 		git status --short
@@ -141,7 +164,7 @@ cmd_update() {
 		read -r -p "Stash and pull? [y/N] " reply
 		if [[ "$reply" =~ ^[Yy]$ ]]; then
 			git stash
-			git pull --ff-only
+			git pull --no-rebase
 			success "Updated. Restoring stash..."
 			git stash pop
 		else
