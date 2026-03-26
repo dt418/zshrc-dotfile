@@ -61,14 +61,15 @@ run_menu() {
 		local fzf_opts="--prompt='Select action > ' --height=50% --reverse --color=bg:+1,pointer:6,highlight:6 --bind=enter:accept"
 
 		choice=$(
-			printf "📦 Install      │ Apply dotfiles symlinks to home\n" \
-				"🔄 Update       │ Git pull + reload config\n" \
-				"🩺 Doctor       │ Check installed tools\n" \
-				"✅ Test         │ Run smoke tests\n" \
-				"📊 Benchmark    │ Measure shell startup time\n" \
-				"📝 Edit Config  │ Open dotfiles in nvim\n" \
-				"🗑️ Uninstall    │ Remove symlinks (with backup)\n" \
-				"❌ Exit         │ Quit menu\n" |
+			printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" \
+				"📦 Install      │ Apply dotfiles symlinks to home" \
+				"🔄 Update       │ Git pull + reload config" \
+				"🩺 Doctor       │ Check installed tools" \
+				"✅ Test         │ Run smoke tests" \
+				"📊 Benchmark    │ Measure shell startup time" \
+				"📝 Edit Config  │ Open dotfiles in nvim" \
+				"🗑️ Uninstall    │ Remove symlinks (with backup)" \
+				"❌ Exit         │ Quit menu" |
 				fzf --delimiter='│' --with-nth=1 $fzf_opts
 		)
 	else
@@ -322,12 +323,32 @@ cmd_doctor() {
 	echo ""
 }
 
+# ─── Help ────────────────────────────────────────────────────────────────
+
+cmd_help() {
+	echo "Usage: install.sh [OPTION]"
+	echo ""
+	echo "Options:"
+	echo "  --help, -h     Show this help message"
+	echo "  --menu         Launch interactive TUI menu (default)"
+	echo "  --uninstall    Remove dotfile symlinks and restore backups"
+	echo "  --doctor       Check for required tools and dependencies"
+	echo "  (no args)      Install dotfiles (same as --menu)"
+	echo ""
+	echo "Examples:"
+	echo "  ./install.sh          # Interactive menu"
+	echo "  ./install.sh --menu   # Same as above"
+	echo "  ./install.sh --uninstall  # Remove dotfiles"
+	echo ""
+}
+
 # ─── Entry point ──────────────────────────────────────────────────────────────
 
 case "${1:-}" in
+--help | -h) cmd_help ;;
 --menu) run_menu ;;
 --uninstall) cmd_uninstall ;;
 --doctor) cmd_doctor ;;
 "") cmd_install ;;
-*) error "Unknown option: $1. Use --menu, --uninstall or --doctor." ;;
+*) error "Unknown option: $1. Use --help, --menu, --uninstall or --doctor." ;;
 esac
