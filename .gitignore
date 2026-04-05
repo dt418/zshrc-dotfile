@@ -51,3 +51,6 @@ skills-lock.json
 # npm
 node_modules/
 package-lock.json
+
+
+ *.local.json
