@@ -14,3 +14,20 @@ source "$ZSH_CONFIG/history-auto-repair.zsh"
 
 # Machine-specific overrides (không commit)
 [[ -f "$ZSH_CONFIG/local.zsh" ]] && source "$ZSH_CONFIG/local.zsh"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# bun completions
+[ -s "/home/thanh/.bun/_bun" ] && source "/home/thanh/.bun/_bun"
+
+# opencode
+export PATH=/home/thanh/.opencode/bin:$PATH
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+. "$HOME/.atuin/bin/env"
+
+eval "$(atuin init zsh)"
+export PATH="$HOME/.local/bin:$PATH"

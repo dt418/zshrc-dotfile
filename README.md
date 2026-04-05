@@ -55,24 +55,44 @@ Xong. Mở terminal mới hoặc chạy `source ~/.zshrc`.
 
 ## 🔧 Yêu cầu
 
-Script sẽ kiểm tra và cảnh báo nếu thiếu tool. Dưới đây là danh sách đầy đủ:
+Script sẽ kiểm tra và cài đặt tự động nếu thiếu tool/plugin. Dưới đây là danh sách đầy đủ:
 
-| Tool | Mục đích | Cài đặt |
-|---|---|---|
-| [zsh](https://www.zsh.org/) | Shell chính | `apt install zsh` |
-| [starship](https://starship.rs/) | Prompt | `curl -sS https://starship.rs/install.sh \| sh` |
-| [eza](https://github.com/eza-community/eza) | `ls` thay thế | `brew install eza` |
-| [bat](https://github.com/sharkdp/bat) | `cat` thay thế | `brew install bat` |
-| [ripgrep](https://github.com/BurntSushi/ripgrep) | `grep` thay thế | `brew install ripgrep` |
-| [fzf](https://github.com/junegunn/fzf) | Fuzzy finder | `brew install fzf` |
-| [zoxide](https://github.com/ajeetdsouza/zoxide) | `cd` thay thế | `brew install zoxide` |
-| [atuin](https://github.com/atuinsh/atuin) | History nâng cao | `curl --proto '=https' --tlsf v1 -LsSf https://setup.atuin.sh \| sh` |
-| [lazygit](https://github.com/jesseduffield/lazygit) | Git TUI | `brew install lazygit` |
-| [lazydocker](https://github.com/jesseduffield/lazydocker) | Docker TUI | `brew install lazydocker` |
-| [btop](https://github.com/aristocratsoftics/btop) | System monitor | `brew install btop` |
-| [duf](https://github.com/muesli/duf) | Disk usage | `brew install duf` |
-| [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions) | Gợi ý lệnh | `brew install zsh-autosuggestions` |
-| [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) | Tô màu syntax | `brew install zsh-syntax-highlighting` |
+### Zsh Plugins (tự động cài qua `./install.sh --plugins`)
+
+| Plugin | Mục đích | 
+|---|---|
+| [fzf](https://github.com/junegunn/fzf) | Fuzzy finder |
+| [zoxide](https://github.com/ajeetdsouza/zoxide) | Smart cd |
+| [starship](https://starship.rs/) | Prompt |
+| [atuin](https://github.com/atuinsh/atuin) | History nâng cao |
+| [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions) | Gợi ý lệnh |
+| [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) | Tô màu syntax |
+
+### CLI Tools (tự động cài qua `./install.sh --tools`)
+
+| Tool | Mục đích |
+|---|---|
+| [eza](https://github.com/eza-community/eza) | `ls` thay thế |
+| [bat](https://github.com/sharkdp/bat) | `cat` thay thế |
+| [ripgrep](https://github.com/BurntSushi/ripgrep) | `grep` thay thế |
+| [lazygit](https://github.com/jesseduffield/lazygit) | Git TUI |
+| [lazydocker](https://github.com/jesseduffield/lazydocker) | Docker TUI |
+| [btop](https://github.com/aristocratsoftics/btop) | System monitor |
+| [duf](https://github.com/muesli/duf) | Disk usage |
+| [nvim](https://neovim.io/) | Neovim |
+| [k9s](https://k9scli.io/) | K8s dashboard |
+
+### Cài đặt tự động
+
+```bash
+./install.sh --plugins   # Kiểm tra và cài zsh plugins
+./install.sh --tools     # Kiểm tra và cài CLI tools
+./install.sh --doctor    # Kiểm tra tất cả tools
+```
+
+Script tự động chọn nơi cài:
+- **User mode**: `~/.local/bin`
+- **Sudo mode**: `/usr/local/bin`
 
 ---
 
@@ -243,7 +263,7 @@ make menu
 ./install.sh --menu
 ```
 
-Menu hỗ trợ `Install`, `Uninstall`, `Doctor`, `Test`, `Bench`.
+Menu hỗ trợ: `Install`, `Update`, `Doctor`, `Plugins`, `Tools`, `Test`, `Benchmark`, `Edit`, `Uninstall`.
 Nếu có `fzf` sẽ dùng fuzzy menu, nếu không có sẽ fallback sang menu dạng `select`.
 
 ### Kiểm tra syntax nhanh

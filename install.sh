@@ -27,6 +27,98 @@ info() { echo -e "${CYAN}[info]${RESET}  $*"; }
 success() { echo -e "${GREEN}[ok]${RESET}    $*"; }
 warn() { echo -e "${YELLOW}[warn]${RESET}  $*"; }
 miss() { echo -e "${RED}[MISS]${RESET}  $*"; }
+PLUGIN_NAMES=("fzf" "zoxide" "starship" "atuin" "zsh-autosuggestions" "zsh-syntax-highlighting")
+PLUGIN_DESCS=("Fuzzy finder" "Smart cd" "Prompt" "Better history" "Autocomplete suggestions" "Syntax highlighting")
+PLUGIN_INSTALL=(
+  "git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install --key-bindings --completion --update-rc"
+  "curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh"
+  "curl -sS https://starship.rs/install.sh | sh"
+  "curl --proto '=https' -LsSf https://setup.atuin.sh | sh"
+  "git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+  "git clone https://github.com/zsh-users/zsh-syntax-highlighting ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"
+)
+PLUGIN_CHECK=(
+  "[[ -f ~/.fzf.zsh || -f ~/.fzf/bin/fzf ]]"
+  "[[ -f ~/.local/bin/zoxide || -f /usr/local/bin/zoxide ]]"
+  "[[ -f ~/.local/bin/starship || -f /usr/local/bin/starship ]]"
+  "[[ -f ~/.atuin/bin/atuin || -f /usr/local/bin/atuin ]]"
+  "[[ -f ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh || -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]"
+  "[[ -f ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh || -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]"
+)
+
+TOOL_NAMES=("eza" "bat" "rg" "lazygit" "lazydocker" "btop" "duf" "nvim" "k9s")
+TOOL_DESCS=("Modern ls" "Cat with syntax" "Ripgrep" "Git TUI" "Docker TUI" "System monitor" "Disk usage" "Neovim" "K8s dashboard")
+TOOL_INSTALL=(
+  "curl -sL https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz | tar xzf - -C \"\$INSTALL_BIN\""
+  "curl -sL \$(curl -s https://api.github.com/repos/sharkdp/bat/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*x86_64-unknown-linux-musl.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/bat-*/bat \"\$INSTALL_BIN/\" && rm -rf /tmp/bat*"
+  "curl -sL \$(curl -s https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*x86_64-unknown-linux-musl.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/rg-*/rg \"\$INSTALL_BIN/\" && rm -rf /tmp/rg*"
+  "curl -sL \$(curl -s https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*Linux_x86_64.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/lazygit \"\$INSTALL_BIN/\" && rm -rf /tmp/lazygit*"
+  "curl -sL \$(curl -s https://api.github.com/repos/jesseduffield/lazydocker/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*Linux_x86_64.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/lazydocker \"\$INSTALL_BIN/\" && rm -rf /tmp/lazydocker*"
+  "curl -sL \$(curl -s https://api.github.com/repos/aristocratos/btop/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*x86_64-linux-musl.tbz\"' | head -1 | cut -d'\"' -f4) | tar xjf - -C /tmp && mv /tmp/btop*/btop \"\$INSTALL_BIN/\" && rm -rf /tmp/btop*"
+  "curl -sL \$(curl -s https://api.github.com/repos/muesli/duf/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*amd64.deb\"' | head -1 | cut -d'\"' -f4) -o /tmp/duf.deb && ar x /tmp/duf.deb && tar xzf data.tar.gz -C /tmp && mv /tmp/usr/bin/duf \"\$INSTALL_BIN/\" && rm -rf /tmp/duf.deb /tmp/data.tar.gz /tmp/usr"
+  "curl -sL https://github.com/neovim/neovim/releases/latest/download/nvim.appimage -o \"\$INSTALL_BIN/nvim\" && chmod +x \"\$INSTALL_BIN/nvim\" && (\"\$INSTALL_BIN/nvim\" --appimage-extract >/dev/null 2>&1 && mv squashfs-root \"\$HOME/.local/\" 2>/dev/null && ln -sf \"\$HOME/.local/squashfs-root/usr/bin/nvim\" \"\$INSTALL_BIN/nvim\" 2>/dev/null) || true"
+  "curl -sL \$(curl -s https://api.github.com/repos/derailed/k9s/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*Linux_amd64.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/k9s \"\$INSTALL_BIN/\" && rm -rf /tmp/k9s*"
+)
+
+install_deps() {
+  echo -e "${BOLD}Checking dependencies...${RESET}"
+
+  local missing_deps=()
+  command -v git >/dev/null 2>&1 || missing_deps+=("git")
+  command -v curl >/dev/null 2>&1 || missing_deps+=("curl")
+  command -v tar >/dev/null 2>&1 || missing_deps+=("tar")
+
+  if [[ ${#missing_deps[@]} -gt 0 ]]; then
+    warn "Missing dependencies: ${missing_deps[*]}"
+    if command -v sudo >/dev/null 2>&1; then
+      echo -e "${CYAN}Installing dependencies...${RESET}"
+      sudo apt-get update -qq 2>/dev/null
+      sudo apt-get install -y "${missing_deps[@]}" 2>/dev/null && success "Dependencies installed" || warn "Could not install dependencies automatically"
+    else
+      warn "Please install: sudo apt-get install ${missing_deps[*]}"
+    fi
+  else
+    success "All dependencies satisfied"
+  fi
+  echo ""
+}
+
+detect_install_mode() {
+  if [[ $EUID -eq 0 ]]; then
+    INSTALL_BIN="/usr/local/bin"
+    INSTALL_MODE="system-wide (sudo)"
+  elif sudo -n true 2>/dev/null; then
+    INSTALL_BIN="/usr/local/bin"
+    INSTALL_MODE="system-wide (sudo)"
+  else
+    INSTALL_BIN="$HOME/.local/bin"
+    INSTALL_MODE="user (~/.local/bin)"
+  fi
+  mkdir -p "$INSTALL_BIN"
+}
+
+TOOL_CHECK=(
+  "command -v eza || [[ -f /usr/local/bin/eza ]] || [[ -f ~/.local/bin/eza ]]"
+  "command -v bat || [[ -f /usr/local/bin/bat ]] || [[ -f ~/.local/bin/bat ]]"
+  "command -v rg || [[ -f /usr/local/bin/rg ]] || [[ -f ~/.local/bin/rg ]]"
+  "command -v lazygit || [[ -f /usr/local/bin/lazygit ]] || [[ -f ~/.local/bin/lazygit ]]"
+  "command -v lazydocker || [[ -f /usr/local/bin/lazydocker ]] || [[ -f ~/.local/bin/lazydocker ]]"
+  "command -v btop || [[ -f /usr/local/bin/btop ]] || [[ -f ~/.local/bin/btop ]]"
+  "command -v duf || [[ -f /usr/local/bin/duf ]] || [[ -f ~/.local/bin/duf ]]"
+  "command -v nvim || [[ -f /usr/local/bin/nvim ]] || [[ -f ~/.local/bin/nvim ]]"
+  "command -v k9s || [[ -f /usr/local/bin/k9s ]] || [[ -f ~/.local/bin/k9s ]]"
+)
+TOOL_CHECK=(
+  "command -v eza || [[ -f ~/.local/bin/eza ]]"
+  "command -v bat || [[ -f ~/.local/bin/bat ]]"
+  "command -v rg || [[ -f ~/.local/bin/rg ]]"
+  "command -v lazygit || [[ -f ~/.local/bin/lazygit ]]"
+  "command -v lazydocker || [[ -f ~/.local/bin/lazydocker ]]"
+  "command -v btop || [[ -f ~/.local/bin/btop ]]"
+  "command -v duf || [[ -f ~/.local/bin/duf ]]"
+  "command -v nvim || [[ -f ~/.local/bin/nvim ]]"
+  "command -v k9s || [[ -f ~/.local/bin/k9s ]]"
+)
 error() {
 	echo -e "${RED}[error]${RESET} $*"
 	exit 1
@@ -61,10 +153,12 @@ run_menu() {
 		local fzf_opts="--prompt='Select action > ' --height=50% --reverse --color=bg:+1,pointer:6,highlight:6 --bind=enter:accept"
 
 		choice=$(
-			printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" \
+			printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n" \
 				"📦 Install      │ Apply dotfiles symlinks to home" \
 				"🔄 Update       │ Git pull + reload config" \
 				"🩺 Doctor       │ Check installed tools" \
+				"🔌 Plugins      │ Check and install missing zsh plugins" \
+				"🔧 Tools        │ Check and install missing tools" \
 				"✅ Test         │ Run smoke tests" \
 				"📊 Benchmark    │ Measure shell startup time" \
 				"📝 Edit Config  │ Open dotfiles in nvim" \
@@ -78,6 +172,8 @@ run_menu() {
 			"Install - Apply dotfiles symlinks to home"
 			"Update - Git pull + reload config"
 			"Doctor - Check installed tools"
+			"Plugins - Check and install missing zsh plugins"
+			"Tools - Check and install missing tools"
 			"Test - Run smoke tests"
 			"Benchmark - Measure shell startup time"
 			"Edit Config - Open dotfiles in nvim"
@@ -98,6 +194,8 @@ run_menu() {
 	Install*) cmd_install ;;
 	Update*) cmd_update ;;
 	Doctor*) cmd_doctor ;;
+	Plugins*) cmd_check_plugins ;;
+	Tools*) cmd_check_tools ;;
 	Test*) cmd_test ;;
 	Benchmark*) cmd_benchmark ;;
 	Edit*) cmd_edit ;;
@@ -323,9 +421,118 @@ cmd_doctor() {
 	echo ""
 }
 
+cmd_check_plugins() {
+	echo ""
+	echo -e "${BOLD}Checking zsh plugins...${RESET}"
+	echo ""
+	install_deps
+
+	local missing_idx=()
+	for i in "${!PLUGIN_NAMES[@]}"; do
+		if ! eval "${PLUGIN_CHECK[$i]}" 2>/dev/null; then
+			missing_idx+=("$i")
+			miss "${PLUGIN_NAMES[$i]} - ${PLUGIN_DESCS[$i]}"
+		else
+			success "${PLUGIN_NAMES[$i]}"
+		fi
+	done
+
+	echo ""
+	if [[ ${#missing_idx[@]} -eq 0 ]]; then
+		success "All plugins installed!"
+	else
+		info "${#missing_idx[@]} plugin(s) missing"
+		echo ""
+		read -r -p "Install missing plugins? [Y/n] " reply
+		if [[ ! "$reply" =~ ^[Nn]$ ]]; then
+			cmd_install_plugins "${missing_idx[@]}"
+		else
+			info "Skipped."
+		fi
+	fi
+	echo ""
+}
+
+cmd_install_plugins() {
+	echo ""
+	echo -e "${BOLD}Installing zsh plugins...${RESET}"
+	echo ""
+
+	for idx in "$@"; do
+		local name="${PLUGIN_NAMES[$idx]}"
+		local desc="${PLUGIN_DESCS[$idx]}"
+		local install_cmd="${PLUGIN_INSTALL[$idx]}"
+		echo -e "${CYAN}Installing${RESET} $name - $desc..."
+		if eval "$install_cmd" 2>&1; then
+			success "$name installed"
+		else
+			miss "Failed to install $name"
+		fi
+		echo ""
+	done
+	success "Done! Restart shell or run: source ~/.zshrc"
+	echo ""
+}
+
+cmd_check_tools() {
+	echo ""
+	echo -e "${BOLD}Checking tools...${RESET}"
+	detect_install_mode
+	echo -e "${CYAN}Install mode:${RESET} $INSTALL_MODE ($INSTALL_BIN)"
+	echo ""
+	install_deps
+
+	local missing_idx=()
+	for i in "${!TOOL_NAMES[@]}"; do
+		if ! eval "${TOOL_CHECK[$i]}" 2>/dev/null; then
+			missing_idx+=("$i")
+			miss "${TOOL_NAMES[$i]} - ${TOOL_DESCS[$i]}"
+		else
+			success "${TOOL_NAMES[$i]}"
+		fi
+	done
+
+	echo ""
+	if [[ ${#missing_idx[@]} -eq 0 ]]; then
+		success "All tools installed!"
+	else
+		info "${#missing_idx[@]} tool(s) missing"
+		echo ""
+		read -r -p "Install missing tools? [Y/n] " reply
+		if [[ ! "$reply" =~ ^[Nn]$ ]]; then
+			cmd_install_tools "${missing_idx[@]}"
+		else
+			info "Skipped."
+		fi
+	fi
+	echo ""
+}
+
+cmd_install_tools() {
+	detect_install_mode
+	echo ""
+	echo -e "${BOLD}Installing tools to $INSTALL_BIN...${RESET}"
+	echo ""
+
+	for idx in "$@"; do
+		local name="${TOOL_NAMES[$idx]}"
+		local desc="${TOOL_DESCS[$idx]}"
+		local install_cmd="${TOOL_INSTALL[$idx]}"
+		echo -e "${CYAN}Installing${RESET} $name - $desc..."
+		if eval "INSTALL_BIN=$INSTALL_BIN HOME=$HOME $install_cmd" 2>&1; then
+			success "$name installed"
+		else
+			miss "Failed to install $name"
+		fi
+		echo ""
+	done
+	success "Done! Restart shell or run: source ~/.zshrc"
+	echo ""
+}
+
 # ─── Help ────────────────────────────────────────────────────────────────
 
-cmd_help() {
+	cmd_help() {
 	echo "Usage: install.sh [OPTION]"
 	echo ""
 	echo "Options:"
@@ -333,11 +540,15 @@ cmd_help() {
 	echo "  --menu         Launch interactive TUI menu (default)"
 	echo "  --uninstall    Remove dotfile symlinks and restore backups"
 	echo "  --doctor       Check for required tools and dependencies"
+	echo "  --plugins      Check and install missing zsh plugins"
+	echo "  --tools       Check and install missing tools"
 	echo "  (no args)      Install dotfiles (same as --menu)"
 	echo ""
 	echo "Examples:"
 	echo "  ./install.sh          # Interactive menu"
 	echo "  ./install.sh --menu   # Same as above"
+	echo "  ./install.sh --plugins   # Check and install plugins"
+	echo "  ./install.sh --tools    # Check and install tools"
 	echo "  ./install.sh --uninstall  # Remove dotfiles"
 	echo ""
 }
@@ -349,6 +560,8 @@ case "${1:-}" in
 --menu) run_menu ;;
 --uninstall) cmd_uninstall ;;
 --doctor) cmd_doctor ;;
+--plugins) cmd_check_plugins ;;
+--tools) cmd_check_tools ;;
 "") cmd_install ;;
-*) error "Unknown option: $1. Use --help, --menu, --uninstall or --doctor." ;;
+*) error "Unknown option: $1. Use --help, --menu, --uninstall, --doctor, --plugins or --tools." ;;
 esac
