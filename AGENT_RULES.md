@@ -1,3 +1,35 @@
+<!-- git-commit-rules -->
+## Git Commit Rules
+
+**ALWAYS verify commits before committing.** This project uses commitlint.
+
+### Commit Message Checklist
+
+- [ ] Header ≤ 72 characters
+- [ ] All lowercase
+- [ ] Type prefix: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
+
+### Quick Verification
+
+```bash
+# Check header length (must be ≤ 72)
+echo -n "<your commit message first line>" | wc -c
+# Should output 72 or less
+```
+
+### Common Types
+
+| Type | Description |
+|------|-------------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `docs` | Documentation only |
+| `refactor` | Code refactoring |
+| `test` | Adding/updating tests |
+| `chore` | Maintenance tasks |
+
+---
+
 <!-- code-review-graph MCP tools -->
 ## MCP Tools: code-review-graph
 
