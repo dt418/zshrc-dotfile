@@ -46,3 +46,10 @@ case ":$PATH:" in
   *":$BROWSER_USE_PATH:"*) ;;
   *) export PATH="$BROWSER_USE_PATH:$PATH" ;;
 esac
+
+# Added by flyctl installer
+export FLYCTL_INSTALL="/home/thanh/.fly"
+export PATH="$FLYCTL_INSTALL/bin:$PATH"
+
+# Turso
+export PATH="$PATH:/home/thanh/.turso"
