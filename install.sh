@@ -227,6 +227,19 @@ cmd_install() {
 	mkdir -p "$STARSHIP_CONFIG_DIR"
 	link "$DOTFILES_DIR/starship/starship.toml" "$STARSHIP_CONFIG_FILE"
 
+	info "Setting up AGENT_RULES.md"
+	link "$DOTFILES_DIR/AGENT_RULES.md" "$HOME/AGENT_RULES.md"
+
+	info "Setting up .mcp.json"
+	link "$DOTFILES_DIR/.mcp.json" "$HOME/.mcp.json"
+
+	info "Setting up .cursor/"
+	mkdir -p "$HOME/.cursor"
+	link "$DOTFILES_DIR/.cursor/mcp.json" "$HOME/.cursor/mcp.json"
+
+	info "Setting up .opencode.json"
+	link "$DOTFILES_DIR/.opencode.json" "$HOME/.opencode.json"
+
 	info "Setting up Git hooks"
 	if [[ -f "$DOTFILES_DIR/package.json" ]]; then
 		(cd "$DOTFILES_DIR" && npx lefthook install 2>/dev/null) || true
@@ -347,6 +360,42 @@ cmd_uninstall() {
 		if [[ "$target" == "$DOTFILES_DIR"* ]]; then
 			rm "$STARSHIP_CONFIG_FILE"
 			warn "Removed symlink: ~/.config/starship.toml"
+			((removed++))
+		fi
+	fi
+
+	if [[ -L "$HOME/AGENT_RULES.md" ]]; then
+		target="$(readlink "$HOME/AGENT_RULES.md")"
+		if [[ "$target" == "$DOTFILES_DIR"* ]]; then
+			rm "$HOME/AGENT_RULES.md"
+			warn "Removed symlink: ~/AGENT_RULES.md"
+			((removed++))
+		fi
+	fi
+
+	if [[ -L "$HOME/.mcp.json" ]]; then
+		target="$(readlink "$HOME/.mcp.json")"
+		if [[ "$target" == "$DOTFILES_DIR"* ]]; then
+			rm "$HOME/.mcp.json"
+			warn "Removed symlink: ~/.mcp.json"
+			((removed++))
+		fi
+	fi
+
+	if [[ -L "$HOME/.cursor/mcp.json" ]]; then
+		target="$(readlink "$HOME/.cursor/mcp.json")"
+		if [[ "$target" == "$DOTFILES_DIR"* ]]; then
+			rm "$HOME/.cursor/mcp.json"
+			warn "Removed symlink: ~/.cursor/mcp.json"
+			((removed++))
+		fi
+	fi
+
+	if [[ -L "$HOME/.opencode.json" ]]; then
+		target="$(readlink "$HOME/.opencode.json")"
+		if [[ "$target" == "$DOTFILES_DIR"* ]]; then
+			rm "$HOME/.opencode.json"
+			warn "Removed symlink: ~/.opencode.json"
 			((removed++))
 		fi
 	fi
