@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- `feat(zsh): add SECRET_GUARD to block secrets from shell history`
+- `feat(docs): add audience, time, and last_updated metadata to docs`
+- `docs: add breadcrumb navigation to how-to and reference docs`
+- `docs: fix broken reference to non-existent run-tests.md`
 - `feat(install): add uv (Python package manager) tool support`
 - `feat(install): add --test, --bench, --edit CLI options`
 - `feat(zsh): add pnpm PATH configuration`

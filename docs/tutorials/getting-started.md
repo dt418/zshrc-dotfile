@@ -1,5 +1,8 @@
 # Getting Started with Dotfiles
 
+> **Audience**: New users | **Time**: 5 minutes | **Last updated**: 2025-04
+> **[docs](../README.md) / tutorials**
+
 This guide will help you install and configure the modular Zsh dotfiles system.
 
 ## Prerequisites

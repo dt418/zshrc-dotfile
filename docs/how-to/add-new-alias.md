@@ -1,5 +1,8 @@
 # How to Add New Aliases
 
+> **Audience**: Developers | **Time**: 2 minutes | **Last updated**: 2025-04
+> **[docs](../README.md) / how-to**
+
 This guide walks you through adding new aliases to your dotfiles configuration and verifying they work correctly.
 
 ## When to Add an Alias
@@ -156,5 +159,4 @@ alias gps="git push"
 ## Related Guides
 
 - [How to Add New Functions](../how-to/add-new-function.md)
-- [Running Tests](../how-to/run-tests.md)
 - [Code Style Guidelines](../reference/code-style.md)

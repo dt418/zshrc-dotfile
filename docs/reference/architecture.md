@@ -1,5 +1,8 @@
 # Dotfiles Architecture
 
+> **Audience**: All users | **Last updated**: 2025-04
+> **[docs](../README.md) / reference**
+
 This document explains the structure and organization of the dotfiles system.
 
 ## Directory Structure
