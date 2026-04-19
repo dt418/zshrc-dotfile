@@ -53,4 +53,8 @@ node_modules/
 package-lock.json
 
 
- *.local.json
+ # Local overrides
+*.local.json
+
+# Code review graph (auto-generated)
+.code-review-graph/

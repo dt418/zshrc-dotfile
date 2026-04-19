@@ -46,8 +46,8 @@ PLUGIN_CHECK=(
   "[[ -f ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh || -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]"
 )
 
-TOOL_NAMES=("eza" "bat" "rg" "lazygit" "lazydocker" "btop" "duf" "nvim" "k9s")
-TOOL_DESCS=("Modern ls" "Cat with syntax" "Ripgrep" "Git TUI" "Docker TUI" "System monitor" "Disk usage" "Neovim" "K8s dashboard")
+TOOL_NAMES=("eza" "bat" "rg" "lazygit" "lazydocker" "btop" "duf" "nvim" "k9s" "uv")
+TOOL_DESCS=("Modern ls" "Cat with syntax" "Ripgrep" "Git TUI" "Docker TUI" "System monitor" "Disk usage" "Neovim" "K8s dashboard" "Python package manager")
 TOOL_INSTALL=(
   "curl -sL https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz | tar xzf - -C \"\$INSTALL_BIN\""
   "curl -sL \$(curl -s https://api.github.com/repos/sharkdp/bat/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*x86_64-unknown-linux-musl.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/bat-*/bat \"\$INSTALL_BIN/\" && rm -rf /tmp/bat*"
@@ -58,6 +58,7 @@ TOOL_INSTALL=(
   "curl -sL \$(curl -s https://api.github.com/repos/muesli/duf/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*amd64.deb\"' | head -1 | cut -d'\"' -f4) -o /tmp/duf.deb && ar x /tmp/duf.deb && tar xzf data.tar.gz -C /tmp && mv /tmp/usr/bin/duf \"\$INSTALL_BIN/\" && rm -rf /tmp/duf.deb /tmp/data.tar.gz /tmp/usr"
   "curl -sL https://github.com/neovim/neovim/releases/latest/download/nvim.appimage -o \"\$INSTALL_BIN/nvim\" && chmod +x \"\$INSTALL_BIN/nvim\" && (\"\$INSTALL_BIN/nvim\" --appimage-extract >/dev/null 2>&1 && mv squashfs-root \"\$HOME/.local/\" 2>/dev/null && ln -sf \"\$HOME/.local/squashfs-root/usr/bin/nvim\" \"\$INSTALL_BIN/nvim\" 2>/dev/null) || true"
   "curl -sL \$(curl -s https://api.github.com/repos/derailed/k9s/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*Linux_amd64.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/k9s \"\$INSTALL_BIN/\" && rm -rf /tmp/k9s*"
+  "curl -LsSf https://astral.sh/uv/install.sh | sh"
 )
 
 install_deps() {
@@ -107,17 +108,7 @@ TOOL_CHECK=(
   "command -v duf || [[ -f /usr/local/bin/duf ]] || [[ -f ~/.local/bin/duf ]]"
   "command -v nvim || [[ -f /usr/local/bin/nvim ]] || [[ -f ~/.local/bin/nvim ]]"
   "command -v k9s || [[ -f /usr/local/bin/k9s ]] || [[ -f ~/.local/bin/k9s ]]"
-)
-TOOL_CHECK=(
-  "command -v eza || [[ -f ~/.local/bin/eza ]]"
-  "command -v bat || [[ -f ~/.local/bin/bat ]]"
-  "command -v rg || [[ -f ~/.local/bin/rg ]]"
-  "command -v lazygit || [[ -f ~/.local/bin/lazygit ]]"
-  "command -v lazydocker || [[ -f ~/.local/bin/lazydocker ]]"
-  "command -v btop || [[ -f ~/.local/bin/btop ]]"
-  "command -v duf || [[ -f ~/.local/bin/duf ]]"
-  "command -v nvim || [[ -f ~/.local/bin/nvim ]]"
-  "command -v k9s || [[ -f ~/.local/bin/k9s ]]"
+  "command -v uv || [[ -f ~/.local/bin/uv ]]"
 )
 error() {
 	echo -e "${RED}[error]${RESET} $*"
@@ -417,6 +408,8 @@ cmd_doctor() {
 	check kubectl "brew install kubectl"
 	check k9s "brew install k9s"
 	check ctop "brew install ctop"
+	check uv "brew install uv"
+	check uvx "uv comes with uv"
 
 	echo ""
 }
@@ -542,6 +535,9 @@ cmd_install_tools() {
 	echo "  --doctor       Check for required tools and dependencies"
 	echo "  --plugins      Check and install missing zsh plugins"
 	echo "  --tools       Check and install missing tools"
+	echo "  --test        Run smoke tests"
+	echo "  --bench       Measure shell startup time"
+	echo "  --edit        Open dotfiles in nvim"
 	echo "  (no args)      Install dotfiles (same as --menu)"
 	echo ""
 	echo "Examples:"
@@ -550,6 +546,7 @@ cmd_install_tools() {
 	echo "  ./install.sh --plugins   # Check and install plugins"
 	echo "  ./install.sh --tools    # Check and install tools"
 	echo "  ./install.sh --uninstall  # Remove dotfiles"
+	echo "  ./install.sh --bench     # Measure startup time"
 	echo ""
 }
 
@@ -562,6 +559,9 @@ case "${1:-}" in
 --doctor) cmd_doctor ;;
 --plugins) cmd_check_plugins ;;
 --tools) cmd_check_tools ;;
+--test) cmd_test ;;
+--bench) cmd_benchmark ;;
+--edit) cmd_edit ;;
 "") cmd_install ;;
-*) error "Unknown option: $1. Use --help, --menu, --uninstall, --doctor, --plugins or --tools." ;;
+*) error "Unknown option: $1. Use --help, --menu, --uninstall, --doctor, --plugins, --tools, --test, --bench, or --edit." ;;
 esac

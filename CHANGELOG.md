@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- `feat(install): add uv (Python package manager) tool support`
+- `feat(install): add --test, --bench, --edit CLI options`
+- `feat(zsh): add pnpm PATH configuration`
+- `feat(zsh): add Browser-Use PATH configuration`
+- `feat(agents): add code-review-graph MCP tools documentation`
 - `AGENTS.md` with comprehensive agent guidelines
 - `.agents/skills/code-review/` - code review skill with reviewer template
 - `.agents/skills/docs-changelog/` - changelog automation skill
@@ -20,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 - `install.sh` now runs `npx lefthook install` on setup
 - `.gitignore` updated with agent directories, npm artifacts, and lefthook files
+- `.gitignore` now supports local JSON config and `.code-review-graph/`
 - Updated `.zshenv` with proper PATH and core exports
 
 ### Fixed

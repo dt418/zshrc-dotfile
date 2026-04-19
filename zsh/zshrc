@@ -31,3 +31,18 @@ export PATH=/home/thanh/.opencode/bin:$PATH
 
 eval "$(atuin init zsh)"
 export PATH="$HOME/.local/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="$HOME/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+# Browser-Use
+BROWSER_USE_PATH="$HOME/.browser-use-env/bin"
+case ":$PATH:" in
+  *":$BROWSER_USE_PATH:"*) ;;
+  *) export PATH="$BROWSER_USE_PATH:$PATH" ;;
+esac
