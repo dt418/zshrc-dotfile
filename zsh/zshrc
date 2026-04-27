@@ -12,9 +12,6 @@ source "$ZSH_CONFIG/functions.zsh"
 source "$ZSH_CONFIG/keybindings.zsh"
 source "$ZSH_CONFIG/history-auto-repair.zsh"
 
-# pyenv shim fix
-fixpyenv
-
 # Initialize pyenv
 if command -v pyenv >/dev/null 2>&1; then
   eval "$(pyenv init -)"
@@ -36,7 +33,6 @@ export PATH=/home/thanh/.opencode/bin:$PATH
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 . "$HOME/.atuin/bin/env"
-
 eval "$(atuin init zsh)"
 export PATH="$HOME/.local/bin:$PATH"
 
