@@ -12,6 +12,9 @@ source "$ZSH_CONFIG/functions.zsh"
 source "$ZSH_CONFIG/keybindings.zsh"
 source "$ZSH_CONFIG/history-auto-repair.zsh"
 
+# pyenv shim fix
+source "$ZSH_CONFIG/fix-pyenv.sh"
+
 # Machine-specific overrides (không commit)
 [[ -f "$ZSH_CONFIG/local.zsh" ]] && source "$ZSH_CONFIG/local.zsh"
 

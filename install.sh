@@ -46,8 +46,8 @@ PLUGIN_CHECK=(
   "[[ -f ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh || -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]"
 )
 
-TOOL_NAMES=("eza" "bat" "rg" "lazygit" "lazydocker" "btop" "duf" "nvim" "k9s" "uv")
-TOOL_DESCS=("Modern ls" "Cat with syntax" "Ripgrep" "Git TUI" "Docker TUI" "System monitor" "Disk usage" "Neovim" "K8s dashboard" "Python package manager")
+TOOL_NAMES=("eza" "bat" "rg" "lazygit" "lazydocker" "btop" "duf" "nvim" "k9s" "uv" "fixpyenv")
+TOOL_DESCS=("Modern ls" "Cat with syntax" "Ripgrep" "Git TUI" "Docker TUI" "System monitor" "Disk usage" "Neovim" "K8s dashboard" "Python package manager" "Pyenv shim fix")
 TOOL_INSTALL=(
   "curl -sL https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz | tar xzf - -C \"\$INSTALL_BIN\""
   "curl -sL \$(curl -s https://api.github.com/repos/sharkdp/bat/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*x86_64-unknown-linux-musl.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/bat-*/bat \"\$INSTALL_BIN/\" && rm -rf /tmp/bat*"
@@ -109,6 +109,7 @@ TOOL_CHECK=(
   "command -v nvim || [[ -f /usr/local/bin/nvim ]] || [[ -f ~/.local/bin/nvim ]]"
   "command -v k9s || [[ -f /usr/local/bin/k9s ]] || [[ -f ~/.local/bin/k9s ]]"
   "command -v uv || [[ -f ~/.local/bin/uv ]]"
+  "command -v fixpyenv >/dev/null 2>&1 || { ZSH_CONFIG=\"\${ZSH_CONFIG:-\$HOME/.config/zsh}\" && [[ -f \"\$ZSH_CONFIG/fix-pyenv.sh\" ]]; }"
 )
 error() {
 	echo -e "${RED}[error]${RESET} $*"

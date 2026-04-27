@@ -54,3 +54,9 @@ alias cls="clear"
 alias reload="source ~/.zshrc"
 alias bt="btop"
 alias df="duf"
+
+# =========================
+# pyenv
+# =========================
+: ${ZSH_CONFIG:="$HOME/.config/zsh"}
+alias fixpyenv="bash $ZSH_CONFIG/fix-pyenv.sh"

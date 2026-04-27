@@ -1,28 +1,28 @@
 # 🛠 dotfiles
 
-Cấu hình shell cá nhân, tổ chức theo kiểu **modular dotfile** — mỗi chức năng một file, dễ chỉnh, dễ mang sang máy mới.
+Personal shell configuration organized in a **modular dotfile** style — one function per file, easy to customize and portable across machines.
 
 ---
 
-## 📁 Cấu trúc
+## 📁 Structure
 
 ```
 dotfiles/
-├── install.sh                    ← Script cài đặt / gỡ cài đặt
-├── Makefile                      ← Shortcut: make install, make update...
+├── install.sh                    ← Install/uninstall script
+├── Makefile                      ← Shortcuts: make install, make update...
 ├── .gitignore
 ├── README.md
 ├── test/
-│   └── zsh_test.sh               ← smoke test cho aliases/functions
+│   └── zsh_test.sh               ← Smoke tests for aliases/functions
 ├── starship/
 │   └── starship.toml             ← ~/.config/starship.toml
 └── zsh/
-    ├── .zshenv                   ← ~/.zshenv (core env cho cả interactive + non-interactive)
-    ├── zshrc                     ← ~/.zshrc  (entry point, chỉ source các module)
+    ├── .zshenv                   ← ~/.zshenv (core env for interactive + non-interactive)
+    ├── zshrc                     ← ~/.zshrc  (entry point, only sources modules)
     └── config/
-        ├── env.zsh               ← entrypoint env, detect OS và source module phù hợp
-        ├── env.shared.zsh        ← phần env dùng chung: bun hook, lazy NVM, atuin, envman
-        ├── env.linux.zsh         ← Linux-specific env (Linuxbrew, path riêng nếu cần)
+        ├── env.zsh               ← entrypoint env, detects OS and sources appropriate module
+        ├── env.shared.zsh        ← shared runtime: bun hook, lazy NVM, atuin, envman
+        ├── env.linux.zsh         ← Linux-specific env (Linuxbrew, custom paths)
         ├── env.macos.zsh         ← macOS-specific env (Homebrew Apple Silicon/Intel)
         ├── options.zsh           ← ZSH options + HISTSIZE
         ├── completion.zsh        ← compinit, zstyle, docker/kubectl completion
@@ -32,16 +32,16 @@ dotfiles/
         ├── keybindings.zsh       ← bindkey
         ├── history-auto-repair.zsh
         ├── history-repair.sh
-        └── local.zsh             ← (KHÔNG commit) override riêng cho từng máy
+        └── local.zsh             ← (NOT committed) per-machine overrides
 ```
 
-> **`local.zsh`** được load cuối cùng — dùng để override alias, thêm env var hoặc cấu hình riêng mà không cần chỉnh file chung.
+> **`local.zsh`** loads last — use it to override aliases, add env vars, or machine-specific config without editing shared files.
 
-> **`.zshenv`** luôn được Zsh load trước (kể cả non-interactive shell). Chỉ để biến môi trường cốt lõi, tránh `source`/`eval` nặng trong file này.
+> **`.zshenv`** is always loaded first by Zsh (even non-interactive shells). Keep only essential environment variables; avoid heavy `source`/`eval` here.
 
 ---
 
-## ⚡ Cài đặt nhanh
+## ⚡ Quick Install
 
 ```bash
 git clone <repo-url> ~/dotfiles
@@ -49,48 +49,62 @@ cd ~/dotfiles
 ./install.sh
 ```
 
-Xong. Mở terminal mới hoặc chạy `source ~/.zshrc`.
+Done. Open a new terminal or run `source ~/.zshrc`.
 
 ---
 
-## 🔧 Yêu cầu
+## 🔧 Requirements
 
-Script sẽ kiểm tra và cài đặt tự động nếu thiếu tool/plugin. Dưới đây là danh sách đầy đủ:
+The script checks and auto-installs missing tools/plugins. Full checklist:
 
-### Zsh Plugins (tự động cài qua `./install.sh --plugins`)
+### Zsh Plugins (auto-installed via `./install.sh --plugins`)
 
-| Plugin | Mục đích | 
+| Plugin | Purpose |
 |---|---|
 | [fzf](https://github.com/junegunn/fzf) | Fuzzy finder |
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | Smart cd |
 | [starship](https://starship.rs/) | Prompt |
-| [atuin](https://github.com/atuinsh/atuin) | History nâng cao |
-| [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions) | Gợi ý lệnh |
-| [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) | Tô màu syntax |
+| [atuin](https://github.com/atuinsh/atuin) | Enhanced history |
+| [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions) | Command suggestions |
+| [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) | Syntax highlighting |
 
-### CLI Tools (tự động cài qua `./install.sh --tools`)
+### CLI Tools (auto-installed via `./install.sh --tools`)
 
-| Tool | Mục đích |
+| Tool | Purpose |
 |---|---|
-| [eza](https://github.com/eza-community/eza) | `ls` thay thế |
-| [bat](https://github.com/sharkdp/bat) | `cat` thay thế |
-| [ripgrep](https://github.com/BurntSushi/ripgrep) | `grep` thay thế |
+| [eza](https://github.com/eza-community/eza) | `ls` replacement |
+| [bat](https://github.com/sharkdp/bat) | `cat` replacement |
+| [ripgrep](https://github.com/BurntSushi/ripgrep) | `grep` replacement |
 | [lazygit](https://github.com/jesseduffield/lazygit) | Git TUI |
 | [lazydocker](https://github.com/jesseduffield/lazydocker) | Docker TUI |
 | [btop](https://github.com/aristocratsoftics/btop) | System monitor |
 | [duf](https://github.com/muesli/duf) | Disk usage |
 | [nvim](https://neovim.io/) | Neovim |
 | [k9s](https://k9scli.io/) | K8s dashboard |
+| [`fixpyenv`](#fixpyenv) | Auto-fix pyenv shim/lock errors |
 
-### Cài đặt tự động
+### `fixpyenv`
+
+Aliases: `fixpyenv` — Runs the `fix-pyenv.sh` script to resolve **"Failed to load pyenv"** or **log stream** errors on shell startup. The script runs automatically via `zshrc`, but you can invoke it manually if issues occur:
 
 ```bash
-./install.sh --plugins   # Kiểm tra và cài zsh plugins
-./install.sh --tools     # Kiểm tra và cài CLI tools
-./install.sh --doctor    # Kiểm tra tất cả tools
+fixpyenv
 ```
 
-Script tự động chọn nơi cài:
+The script will:
+- Find and remove stale pyenv shim files
+- Clean `__pycache__` directories in `~/.pyenv/versions/`
+- Fix permission issues on pyenv directories
+
+### Automatic Installation
+
+```bash
+./install.sh --plugins   # Check and install zsh plugins
+./install.sh --tools     # Check and install CLI tools
+./install.sh --doctor    # Check all tools
+```
+
+The script auto-selects install location:
 - **User mode**: `~/.local/bin`
 - **Sudo mode**: `/usr/local/bin`
 
@@ -100,19 +114,19 @@ Script tự động chọn nơi cài:
 
 ### Modern CLI
 
-| Alias | Lệnh thật | Mô tả |
+| Alias | Command | Description |
 |---|---|---|
-| `ls` | `eza --icons` | List file với icon |
-| `ll` | `eza -lah --icons` | List chi tiết |
-| `la` | `eza -a --icons` | Bao gồm file ẩn |
-| `tree` | `eza --tree --icons` | Dạng cây |
-| `cat` | `bat` | Hiển thị file có syntax highlight |
-| `grep` | `rg` | Tìm kiếm nhanh hơn |
-| `rgd` | `rg -g "!*.log" -g "!node_modules"` | rg bỏ qua log và node_modules |
+| `ls` | `eza --icons` | List files with icons |
+| `ll` | `eza -lah --icons` | Detailed list |
+| `la` | `eza -a --icons` | Include hidden files |
+| `tree` | `eza --tree --icons` | Tree view |
+| `cat` | `bat` | View file with syntax highlighting |
+| `grep` | `rg` | Faster search |
+| `rgd` | `rg -g "!*.log" -g "!node_modules"` | rg ignoring logs and node_modules |
 
 ### Git
 
-| Alias | Lệnh thật |
+| Alias | Command |
 |---|---|
 | `g` | `git` |
 | `gs` | `git status` |
@@ -130,7 +144,7 @@ Script tự động chọn nơi cài:
 
 ### Docker
 
-| Alias | Lệnh thật |
+| Alias | Command |
 |---|---|
 | `d` | `docker` |
 | `dc` | `docker compose` |
@@ -144,7 +158,7 @@ Script tự động chọn nơi cài:
 
 ### Kubernetes
 
-| Alias | Lệnh thật |
+| Alias | Command |
 |---|---|
 | `k` | `k9s` |
 | `kgp` | `kubectl get pods` |
@@ -153,7 +167,7 @@ Script tự động chọn nơi cài:
 
 ### System
 
-| Alias | Lệnh thật |
+| Alias | Command |
 |---|---|
 | `cls` | `clear` |
 | `bt` | `btop` |
@@ -165,49 +179,49 @@ Script tự động chọn nơi cài:
 ## 🔍 Functions
 
 ### `fsearch <pattern>`
-Tìm nội dung trong file → preview với bat → mở file trong nvim đúng dòng.
+Search file content → preview with bat → open in nvim at correct line.
 ```bash
 fsearch "TODO"
 ```
 
 ### `hs <pattern>`
-Tìm trong file config (yaml, toml, json) với fzf preview.
+Search config files (yaml, toml, json) with fzf preview.
 ```bash
 hs "traefik"
 ```
 
 ### `hgrep <pattern>`
-Tìm với context 3 dòng trong `*.yml`, `*.yaml`, `*.env`.
+Search with 3 lines context in `*.yml`, `*.yaml`, `*.env`.
 ```bash
 hgrep "DATABASE_URL"
 ```
 
 ### `sgrep <pattern> <service>`
-Tìm trong thư mục `services/<service>`.
+Search inside `services/<service>` directory.
 ```bash
 sgrep "PORT" api
 ```
 
 ### `dsearch <pattern>`
-Tìm trong file docker-compose.
+Search inside docker-compose files.
 ```bash
 dsearch "volumes"
 ```
 
 ### `lsearch <pattern>`
-Tìm trong `/var/log` và `~/logs`.
+Search in `/var/log` and `~/logs`.
 ```bash
 lsearch "error"
 ```
 
 ### `dklog <service> <pattern>`
-Xem log docker compose + filter realtime.
+View docker compose logs + realtime filter.
 ```bash
 dklog api "ERROR"
 ```
 
 ### `log <service> [pattern]`
-Xem log docker hoặc k8s tùy biến `MODE`.
+View docker or k8s logs depending on `MODE` variable.
 ```bash
 log api "panic"
 MODE=k8s log my-pod "timeout"
@@ -217,74 +231,74 @@ MODE=k8s log my-pod "timeout"
 
 ## 🛠 Workflow
 
-### Cập nhật dotfiles
+### Update dotfiles
 
 ```bash
-# Chỉnh file trong ~/dotfiles/zsh/
+# Edit files in ~/dotfiles/zsh/
 vim ~/dotfiles/zsh/config/aliases.zsh
 
-# Reload ngay
-reload   # hoặc: source ~/.zshrc
+# Reload immediately
+reload   # or: source ~/.zshrc
 
-# Commit và push
+# Commit and push
 cd ~/dotfiles
 git add . && git commit -m "feat: add new alias"
 git push
 ```
 
-### Đồng bộ sang máy khác
+### Sync to another machine
 
 ```bash
-git pull   # trong ~/dotfiles/
+git pull   # in ~/dotfiles/
 ```
 
-Vì dùng symlink nên thay đổi có hiệu lực ngay — không cần chạy lại `install.sh`.
+Changes take effect immediately thanks to symlinks — no need to re-run `install.sh`.
 
-### Quản lý bằng chezmoi (cơ bản)
+### Manage with chezmoi (optional)
 
-Repo vẫn giữ cấu trúc hiện tại. Các lệnh dưới đây chỉ thêm workflow tùy chọn để quản lý dotfiles bằng chezmoi:
+The repo keeps its current structure. These commands add an optional chezmoi-based workflow:
 
 ```bash
-# Cài chezmoi vào ~/.local/bin
+# Install chezmoi to ~/.local/bin
 make chezmoi-install
 
-# Khởi tạo từ repo này và apply ngay
+# Initialize from this repo and apply immediately
 make chezmoi-init
 
-# Apply các thay đổi mới
+# Apply new changes
 make chezmoi-apply
 ```
 
-### Dùng TUI menu cho thao tác nhanh
+### Use TUI menu for quick actions
 
 ```bash
 make menu
-# hoặc
+# or
 ./install.sh --menu
 ```
 
-Menu hỗ trợ: `Install`, `Update`, `Doctor`, `Plugins`, `Tools`, `Test`, `Benchmark`, `Edit`, `Uninstall`.
-Nếu có `fzf` sẽ dùng fuzzy menu, nếu không có sẽ fallback sang menu dạng `select`.
+Menu supports: `Install`, `Update`, `Doctor`, `Plugins`, `Tools`, `Test`, `Benchmark`, `Edit`, `Uninstall`.
+If `fzf` is available it uses fuzzy menu; otherwise falls back to `select`-style menu.
 
-### Kiểm tra syntax nhanh
+### Quick syntax check
 
 ```bash
 make lint
 ```
 
-### Chạy smoke test
+### Run smoke tests
 
 ```bash
 make test
 ```
 
-Chạy một test đơn theo alias:
+Run a single alias test:
 
 ```bash
 make test TEST="alias ls"
 ```
 
-### Gỡ cài đặt
+### Uninstall
 
 ```bash
 cd ~/dotfiles && ./install.sh --uninstall
@@ -292,12 +306,12 @@ cd ~/dotfiles && ./install.sh --uninstall
 
 ---
 
-## ⚙️ Tùy chỉnh riêng (local.zsh)
+## ⚙️ Per-machine Customization (`local.zsh`)
 
-Tạo file `~/.config/zsh/local.zsh` cho cấu hình riêng của từng máy (không bị commit):
+Create `~/.config/zsh/local.zsh` for machine-specific settings (not committed):
 
 ```bash
-# Ví dụ: ~/.config/zsh/local.zsh
+# Example: ~/.config/zsh/local.zsh
 
 export WORK_TOKEN="ghp_..."
 export KUBECONFIG="$HOME/.kube/work-cluster.yaml"
@@ -306,15 +320,15 @@ alias vpn="sudo openvpn ~/work.ovpn"
 
 ---
 
-## 🚀 Đề xuất cải tiến
+## 🚀 Proposed Improvements
 
-Xem chi tiết trong [`IMPROVEMENTS.md`](./IMPROVEMENTS.md).
+See details in [`IMPROVEMENTS.md`](./IMPROVEMENTS.md).
 
 ---
 
 ## 💡 Tips
 
-- **`Ctrl+R`** → fzf history search (hoặc dùng atuin nếu đã cài)
-- **`z <tên-thư-mục>`** → nhảy nhanh đến thư mục đã từng cd vào (zoxide)
-- **`fsearch`** → tìm code trong project, Enter để mở nvim đúng dòng
-- History tự sửa khi bị corrupt nhờ `history-auto-repair.zsh`
+- **`Ctrl+R`** → fzf history search (or use atuin if installed)
+- **`z <directory>`** → jump to frequently-used directories (zoxide)
+- **`fsearch`** → search codebase, Enter opens nvim at correct line
+- History auto-repairs on corruption via `history-auto-repair.zsh`
