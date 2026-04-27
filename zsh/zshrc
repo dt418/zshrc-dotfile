@@ -13,7 +13,12 @@ source "$ZSH_CONFIG/keybindings.zsh"
 source "$ZSH_CONFIG/history-auto-repair.zsh"
 
 # pyenv shim fix
-source "$ZSH_CONFIG/fix-pyenv.sh"
+fixpyenv
+
+# Initialize pyenv
+if command -v pyenv >/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
 
 # Machine-specific overrides (không commit)
 [[ -f "$ZSH_CONFIG/local.zsh" ]] && source "$ZSH_CONFIG/local.zsh"
