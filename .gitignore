@@ -58,3 +58,6 @@ package-lock.json
 
 # Code review graph (auto-generated)
 .code-review-graph/
+
+# Session logs
+session-ses_*.md
