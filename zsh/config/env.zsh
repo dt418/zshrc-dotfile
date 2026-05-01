@@ -5,9 +5,6 @@
 
 ZSH_CONFIG="${ZSH_CONFIG:-$HOME/.config/zsh}"
 
-# Shared runtime setup
-[[ -f "$ZSH_CONFIG/env.shared.zsh" ]] && source "$ZSH_CONFIG/env.shared.zsh"
-
 # OS-specific setup
 case "$(uname -s)" in
   Darwin)
@@ -17,3 +14,6 @@ case "$(uname -s)" in
     [[ -f "$ZSH_CONFIG/env.linux.zsh" ]] && source "$ZSH_CONFIG/env.linux.zsh"
     ;;
 esac
+
+# Shared runtime setup
+[[ -f "$ZSH_CONFIG/env.shared.zsh" ]] && source "$ZSH_CONFIG/env.shared.zsh"
