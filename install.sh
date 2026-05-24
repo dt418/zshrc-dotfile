@@ -46,19 +46,23 @@ PLUGIN_CHECK=(
   "[[ -f ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh || -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]"
 )
 
-TOOL_NAMES=("eza" "bat" "rg" "lazygit" "lazydocker" "btop" "duf" "nvim" "k9s" "uv")
-TOOL_DESCS=("Modern ls" "Cat with syntax" "Ripgrep" "Git TUI" "Docker TUI" "System monitor" "Disk usage" "Neovim" "K8s dashboard" "Python package manager")
+TOOL_NAMES=("eza" "bat" "rg" "lazygit" "lazydocker" "btop" "duf" "nvim" "k9s" "uv" "codegraph" "graphify" "kubectl" "ctop")
+TOOL_DESCS=("Modern ls" "Cat with syntax" "Ripgrep" "Git TUI" "Docker TUI" "System monitor" "Disk usage" "Neovim" "K8s dashboard" "Python package manager" "Code graph analysis" "Knowledge graph from code" "Kubernetes CLI" "Container terminal")
 TOOL_INSTALL=(
   "curl -sL https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-gnu.tar.gz | tar xzf - -C \"\$INSTALL_BIN\""
   "curl -sL \$(curl -s https://api.github.com/repos/sharkdp/bat/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*x86_64-unknown-linux-musl.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/bat-*/bat \"\$INSTALL_BIN/\" && rm -rf /tmp/bat*"
   "curl -sL \$(curl -s https://api.github.com/repos/BurntSushi/ripgrep/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*x86_64-unknown-linux-musl.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/rg-*/rg \"\$INSTALL_BIN/\" && rm -rf /tmp/rg*"
-  "curl -sL \$(curl -s https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*Linux_x86_64.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/lazygit \"\$INSTALL_BIN/\" && rm -rf /tmp/lazygit*"
+  "curl -sL \$(curl -s https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*linux_x86_64.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/lazygit \"\$INSTALL_BIN/\" && rm -rf /tmp/lazygit*"
   "curl -sL \$(curl -s https://api.github.com/repos/jesseduffield/lazydocker/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*Linux_x86_64.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/lazydocker \"\$INSTALL_BIN/\" && rm -rf /tmp/lazydocker*"
   "curl -sL \$(curl -s https://api.github.com/repos/aristocratos/btop/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*x86_64-linux-musl.tbz\"' | head -1 | cut -d'\"' -f4) | tar xjf - -C /tmp && mv /tmp/btop*/btop \"\$INSTALL_BIN/\" && rm -rf /tmp/btop*"
   "curl -sL \$(curl -s https://api.github.com/repos/muesli/duf/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*amd64.deb\"' | head -1 | cut -d'\"' -f4) -o /tmp/duf.deb && ar x /tmp/duf.deb && tar xzf data.tar.gz -C /tmp && mv /tmp/usr/bin/duf \"\$INSTALL_BIN/\" && rm -rf /tmp/duf.deb /tmp/data.tar.gz /tmp/usr"
   "curl -sL https://github.com/neovim/neovim/releases/latest/download/nvim.appimage -o \"\$INSTALL_BIN/nvim\" && chmod +x \"\$INSTALL_BIN/nvim\" && (\"\$INSTALL_BIN/nvim\" --appimage-extract >/dev/null 2>&1 && mv squashfs-root \"\$HOME/.local/\" 2>/dev/null && ln -sf \"\$HOME/.local/squashfs-root/usr/bin/nvim\" \"\$INSTALL_BIN/nvim\" 2>/dev/null) || true"
   "curl -sL \$(curl -s https://api.github.com/repos/derailed/k9s/releases/latest | grep -o '\"browser_download_url\": \"[^\"]*Linux_amd64.tar.gz\"' | head -1 | cut -d'\"' -f4) | tar xzf - -C /tmp && mv /tmp/k9s \"\$INSTALL_BIN/\" && rm -rf /tmp/k9s*"
   "curl -LsSf https://astral.sh/uv/install.sh | sh"
+  "command -v codegraph >/dev/null || curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh"
+  "command -v graphify >/dev/null || pip install --break-system-packages graphify-ai"
+  "curl -sLO https://dl.k8s.io/release/\$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl && mv kubectl \"\$INSTALL_BIN/\" && chmod +x \"\$INSTALL_BIN/kubectl\""
+  "curl -sL https://github.com/bcicen/ctop/releases/latest/download/ctop-\$(curl -s https://api.github.com/repos/bcicen/ctop/releases/latest | grep tag_name | cut -d'\"' -f4 | sed 's/v//')-linux-amd64 -o \"\$INSTALL_BIN/ctop\" && chmod +x \"\$INSTALL_BIN/ctop\""
 )
 
 install_deps() {
@@ -109,6 +113,10 @@ TOOL_CHECK=(
    "command -v nvim || [[ -f /usr/local/bin/nvim ]] || [[ -f ~/.local/bin/nvim ]]"
    "command -v k9s || [[ -f /usr/local/bin/k9s ]] || [[ -f ~/.local/bin/k9s ]]"
    "command -v uv || [[ -f ~/.local/bin/uv ]]"
+   "command -v codegraph || [[ -f /usr/local/bin/codegraph ]] || [[ -f ~/.local/bin/codegraph ]] || [[ -f \"\$HOME/.local/share/codegraph\" ]]"
+   "command -v graphify || [[ -f /usr/local/bin/graphify ]] || [[ -f ~/.local/bin/graphify ]]"
+   "command -v kubectl || [[ -f /usr/local/bin/kubectl ]] || [[ -f ~/.local/bin/kubectl ]]"
+   "command -v ctop || [[ -f /usr/local/bin/ctop ]] || [[ -f ~/.local/bin/ctop ]]"
 )
 error() {
 	echo -e "${RED}[error]${RESET} $*"
