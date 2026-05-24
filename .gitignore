@@ -61,3 +61,6 @@ package-lock.json
 
 # Session logs
 session-ses_*.md
+
+# Graphify output (auto-generated)
+graphify-out/
