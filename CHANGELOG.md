@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - `feat(zsh): add SECRET_GUARD to block secrets from shell history`
+- `feat(install): add codegraph and graphify as required tools`
+- `feat(install): add kubectl and ctop as required tools`
 - `feat(docs): add audience, time, and last_updated metadata to docs`
 - `docs: add breadcrumb navigation to how-to and reference docs`
 - `docs: fix broken reference to non-existent run-tests.md`
@@ -28,12 +30,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 - `install.sh` now runs `npx lefthook install` on setup
-- `.gitignore` updated with agent directories, npm artifacts, and lefthook files
+- `.gitignore` updated with agent directories, npm artifacts, lefthook files, and graphify output
 - `.gitignore` now supports local JSON config and `.code-review-graph/`
 - Updated `.zshenv` with proper PATH and core exports
 
 ### Fixed
 - `_load_nvm` function now safely handles unset function names
+- `lazygit` download URL uses correct case for `linux_x86_64` architecture
 - `_load_nvm` auto-detects NVM_DIR from common locations (`~/.nvm`, `~/.local/share/nvm`, `~/nvm`) for Linux/Windows
 - Added lazy-load wrappers for `yarn`, `pnpm`, `bun` alongside existing `nvm/node/npm/npx`
 - Commit message format enforced via commitlint (lowercase header)
