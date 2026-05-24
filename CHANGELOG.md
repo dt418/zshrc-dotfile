@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - `feat(zsh): add SECRET_GUARD to block secrets from shell history`
 - `feat(install): add codegraph and graphify as required tools`
+- `fix(install): update codegraph and graphify install hints`
+- `fix(install): update graphify install hint to use uv tool install`
 - `feat(install): add kubectl and ctop as required tools`
 - `feat(docs): add audience, time, and last_updated metadata to docs`
 - `docs: add breadcrumb navigation to how-to and reference docs`

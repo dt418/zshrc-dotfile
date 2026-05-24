@@ -465,6 +465,8 @@ cmd_doctor() {
 	check kubectl "brew install kubectl"
 	check k9s "brew install k9s"
 	check ctop "brew install ctop"
+	check codegraph "brew install codegraph || curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh"
+	check graphify "uv tool install graphify"
 	check uv "brew install uv"
 	check uvx "uv comes with uv"
 
