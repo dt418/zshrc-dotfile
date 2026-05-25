@@ -32,10 +32,6 @@ export PATH=/home/thanh/.opencode/bin:$PATH
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-. "$HOME/.atuin/bin/env"
-eval "$(atuin init zsh)"
-export PATH="$HOME/.local/bin:$PATH"
-
 # pnpm
 export PNPM_HOME="$HOME/.local/share/pnpm"
 case ":$PATH:" in
